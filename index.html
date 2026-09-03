@@ -348,22 +348,23 @@
   .venue-btn:hover{ background: var(--rosewood); color:#fff; border-color:var(--rosewood); }
 
   /* GALLERY / MOMENTS OF LOVE */
-  .gallery-section{ background: var(--cream-deep); text-align:center; }
-  .gallery-section h2{ font-family:'Mrs Saint Delafield', cursive; font-size: 52px; margin-top:6px; color:var(--rosewood); }
+  .gallery-section{ background: var(--cream-deep); text-align:center; padding: 90px 8vw; }
+  .gallery-section h2{ font-family:'Mrs Saint Delafield', cursive; font-size: clamp(42px, 8vw, 56px); margin-top:6px; color:var(--rosewood); }
   .gallery-grid{
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
-    max-width: 1040px; margin: 44px auto 0;
+    max-width: 1080px; margin: 44px auto 0;
   }
   .gallery-item{
-    position: relative; border-radius: 3px; overflow: hidden; border: 1px solid var(--divider);
+    position: relative; border-radius: 4px; overflow: hidden; border: 1px solid var(--divider);
     background: #FFFCF8; box-shadow: 0 16px 36px -20px rgba(74,32,24,0.3);
     transition: transform 0.35s ease, box-shadow 0.35s ease;
+    display: flex; flex-direction: column;
   }
   .gallery-item:hover{
     transform: translateY(-6px); box-shadow: 0 24px 44px -16px rgba(74,32,24,0.4);
   }
   .gallery-img-wrap{
-    width: 100%; height: 380px; overflow: hidden; position: relative;
+    width: 100%; aspect-ratio: 3 / 4; overflow: hidden; position: relative; background: #EFE4D8;
   }
   .gallery-img-wrap img{
     width: 100%; height: 100%; object-fit: cover; display: block;
@@ -374,7 +375,7 @@
   }
   .gallery-caption{
     padding: 16px 14px 18px; text-align: center; background: #FFFCF8;
-    border-top: 1px solid rgba(195, 154, 62, 0.2);
+    border-top: 1px solid rgba(195, 154, 62, 0.2); margin-top: auto;
   }
   .gallery-caption .g-tag{
     font-family: 'EB Garamond', serif; letter-spacing: 0.24em; text-transform: uppercase;
@@ -386,18 +387,30 @@
   }
 
   /* PHOTO HERO BANNER */
-  .photo-banner{ position:relative; width:100%; height: 75vh; min-height: 460px; overflow:hidden; }
-  .photo-banner img{ width:100%; height:100%; object-fit:cover; object-position: center 25%; display:block; filter: saturate(0.95) contrast(1.02); }
+  .photo-banner{
+    position: relative; width: 100%; height: 80vh; min-height: 520px; max-height: 820px; overflow: hidden;
+  }
+  .photo-banner-img{
+    width: 100%; height: 100%; object-fit: cover; object-position: 75% 20%; display: block;
+    filter: saturate(0.96) contrast(1.02);
+  }
   .photo-banner-overlay{
-    position:absolute; inset:0; background: linear-gradient(180deg, rgba(43,19,16,0.08) 0%, rgba(43,19,16,0.65) 100%);
-    display:flex; flex-direction:column; align-items:center; justify-content:flex-end; text-align:center; padding-bottom: 50px;
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(43,19,16,0.02) 0%, rgba(43,19,16,0.25) 55%, rgba(43,19,16,0.85) 100%);
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+    text-align: center; padding-bottom: 50px;
+  }
+  .photo-banner-content{
+    max-width: 620px; padding: 0 24px;
   }
   .photo-banner-overlay .p-verse{
     font-family: 'EB Garamond', serif; font-style: italic; color: #F8ECE0;
-    font-size: 20px; letter-spacing: 0.04em; max-width: 520px; padding: 0 20px;
+    font-size: clamp(17px, 3.5vw, 22px); letter-spacing: 0.04em; line-height: 1.5;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
   }
   .photo-banner-overlay .p-names{
-    font-family: 'Mrs Saint Delafield', cursive; font-size: 44px; color: #F3E4C9; margin-top: 8px;
+    font-family: 'Mrs Saint Delafield', cursive; font-size: clamp(38px, 8vw, 56px);
+    color: #F3E4C9; margin-top: 6px; text-shadow: 0 2px 10px rgba(0,0,0,0.4);
   }
 
   /* CLOSING */
@@ -411,17 +424,48 @@
   .closing .tag{ font-family:'Playfair Display', serif; font-style:italic; color: var(--gold-soft); font-size:20px; margin-top: 22px; }
   .closing .foot{ margin-top: 42px; letter-spacing:0.2em; font-size:11px; color: rgba(243,228,201,0.55); text-transform:uppercase; }
 
-  @media (max-width: 860px){
-    .gallery-grid{ grid-template-columns: 1fr; max-width: 380px; }
-    .gallery-img-wrap{ height: 420px; }
+  /* RESPONSIVE MEDIA QUERIES */
+  @media (max-width: 992px){
+    .gallery-grid{
+      grid-template-columns: repeat(2, 1fr); max-width: 720px;
+    }
+    .gallery-grid .gallery-item:last-child{
+      grid-column: span 2; max-width: 360px; margin: 0 auto; width: 100%;
+    }
   }
 
-  @media (max-width: 600px){
-    section{ padding: 70px 7vw; }
+  @media (max-width: 768px){
+    section{ padding: 64px 6vw; }
+    .gallery-grid{
+      grid-template-columns: 1fr; max-width: 360px; gap: 20px;
+    }
+    .gallery-grid .gallery-item:last-child{
+      grid-column: auto; max-width: 100%;
+    }
+    .photo-banner{ height: 65vh; min-height: 440px; }
+    .photo-banner-img{ object-position: 78% 18%; }
     .cards{ gap: 20px; }
-    .card{ width: 100%; max-width: 340px; }
-    .couple-row{ gap: 20px; }
-    .amp{ display:none; }
+    .card{ width: 100%; max-width: 360px; padding: 32px 24px; }
+    .venue-grid{ gap: 20px; }
+    .venue-card{ width: 100%; max-width: 360px; padding: 36px 24px; }
+    .couple-row{ flex-direction: column; align-items: center; gap: 24px; }
+    .couple-col{ width: 100%; max-width: 320px; text-align: center; }
+    .amp{ display: block; font-size: 34px; margin: 0; }
+    .countdown-grid{ gap: 10px; }
+    .cbox{ padding: 18px 4px; }
+    .cnum{ font-size: clamp(24px, 7vw, 36px); }
+  }
+
+  @media (max-width: 480px){
+    section{ padding: 50px 5vw; }
+    .countdown-grid{ gap: 6px; }
+    .cbox{ padding: 14px 2px; }
+    .cnum{ font-size: 22px; }
+    .clabel{ font-size: 9px; letter-spacing: 0.15em; }
+    .cover-top{ top: 5%; padding: 0 4%; }
+    .cover-bottom{ bottom: 7%; padding: 0 6%; }
+    .cover-name .n{ font-size: 32px; }
+    .cover-name .r{ font-size: 8.5px; }
   }
 
   /* ---- Mute / Unmute button ---- */
@@ -684,7 +728,7 @@
     <div class="gallery-grid">
       <div class="gallery-item">
         <div class="gallery-img-wrap">
-          <img src="couple1.jpg" alt="Mira & Divya on the steps" style="object-position: center 20%;">
+          <img src="couple1.jpg" alt="Mira & Divya on the steps" style="object-position: center 8%;">
         </div>
         <div class="gallery-caption">
           <div class="g-tag">✦ Together Forever ✦</div>
@@ -694,7 +738,7 @@
 
       <div class="gallery-item">
         <div class="gallery-img-wrap">
-          <img src="couple3.jpg" alt="Mira & Divya close embrace" style="object-position: center 25%;">
+          <img src="couple3.jpg" alt="Mira & Divya close embrace" style="object-position: center 36%;">
         </div>
         <div class="gallery-caption">
           <div class="g-tag">✦ Infinite Love ✦</div>
@@ -704,7 +748,7 @@
 
       <div class="gallery-item">
         <div class="gallery-img-wrap">
-          <img src="couple2.jpg" alt="Mira & Divya garden portrait" style="object-position: 70% center;">
+          <img src="couple2.jpg" alt="Mira & Divya garden portrait" style="object-position: 78% 18%;">
         </div>
         <div class="gallery-caption">
           <div class="g-tag">✦ Our Journey ✦</div>
@@ -716,10 +760,12 @@
 
   <!-- PHOTO HERO BANNER -->
   <section class="photo-banner">
-    <img src="couple3.jpg" alt="Mira and Divya">
+    <img src="couple2.jpg" alt="Mira and Divya" class="photo-banner-img">
     <div class="photo-banner-overlay">
-      <p class="p-verse">“Where you go I will go, and where you stay I will stay.”</p>
-      <div class="p-names">Mira &amp; Divya</div>
+      <div class="photo-banner-content">
+        <p class="p-verse">“Where you go I will go, and where you stay I will stay.”</p>
+        <div class="p-names">Mira &amp; Divya</div>
+      </div>
     </div>
   </section>
 
