@@ -550,9 +550,25 @@
 <body>
 
 <!-- Background music (autoplay, loop) -->
-<audio id="bg-music" src="music.mp3" autoplay loop playsinline preload="auto">
+<audio id="bg-music" src="music.mp3" loop autoplay playsinline webkit-playsinline preload="auto">
   <source src="music.mp3" type="audio/mpeg">
 </audio>
+<script>
+  // Immediate auto-play attempt as soon as the audio element is parsed in the DOM
+  (function(){
+    var a = document.getElementById('bg-music');
+    if (!a) return;
+    a.volume = 0.55;
+    var p = a.play();
+    if (p !== undefined) {
+      p.catch(function(){
+        // Fallback for strict browser policies: start stream muted so it starts playing immediately
+        a.muted = true;
+        a.play().catch(function(){});
+      });
+    }
+  })();
+</script>
 
 <!-- Mute / Unmute button — fixed bottom-left, always visible -->
 <button id="mute-btn" aria-label="Toggle music" title="Toggle music">
@@ -810,44 +826,57 @@
   const main = document.getElementById('main');
   document.documentElement.classList.add('locked');
 
-  // ---- Background music setup ----
+  // ---- Background music setup & aggressive auto-play ----
   const audio = document.getElementById('bg-music');
   const muteBtn = document.getElementById('mute-btn');
   const iconSound = document.getElementById('icon-sound');
   const iconMuted = document.getElementById('icon-muted');
-  let musicStarted = false;
+  let musicPlaying = false;
   let opened = false;
 
-  function tryPlayMusic() {
+  function unlockAndPlayAudio() {
     if (!audio) return;
-    audio.volume = 0.5;
+    audio.muted = false;
+    audio.volume = 0.55;
     const playPromise = audio.play();
     if (playPromise !== undefined) {
       playPromise.then(() => {
-        musicStarted = true;
+        musicPlaying = true;
         if (iconSound) iconSound.style.display = '';
         if (iconMuted) iconMuted.style.display = 'none';
       }).catch(() => {
-        // Handled on subsequent user gesture
+        // Fallback: keep playing muted until first interaction
+        if (audio.paused) {
+          audio.muted = true;
+          audio.play().catch(() => {});
+        }
       });
     }
   }
 
-  // Attempt to play music immediately on opening page load
-  tryPlayMusic();
-  window.addEventListener('load', tryPlayMusic);
-  document.addEventListener('DOMContentLoaded', tryPlayMusic);
+  // Attempt to play on every startup lifecycle event
+  unlockAndPlayAudio();
+  window.addEventListener('load', unlockAndPlayAudio);
+  window.addEventListener('pageshow', unlockAndPlayAudio);
+  document.addEventListener('DOMContentLoaded', unlockAndPlayAudio);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && (!musicPlaying || audio.paused)) {
+      unlockAndPlayAudio();
+    }
+  });
 
-  // Play music on any early user interaction on opening page
-  ['click', 'touchstart', 'touchend', 'pointerdown', 'keydown'].forEach(evt => {
-    window.addEventListener(evt, tryPlayMusic, { once: true, passive: true });
-    document.addEventListener(evt, tryPlayMusic, { once: true, passive: true });
+  // Attach global unlock to any interaction anywhere on the screen
+  const triggerEvents = ['pointerdown', 'touchstart', 'touchend', 'mousedown', 'mouseup', 'click', 'keydown', 'scroll', 'wheel'];
+  triggerEvents.forEach(evt => {
+    window.addEventListener(evt, unlockAndPlayAudio, { passive: true });
+    document.addEventListener(evt, unlockAndPlayAudio, { passive: true });
+    document.documentElement.addEventListener(evt, unlockAndPlayAudio, { passive: true });
   });
 
   function openInvite() {
     if (opened) return;
     opened = true;
-    tryPlayMusic();
+    unlockAndPlayAudio();
     cover.classList.add('open');
     if (main) main.classList.add('show');
     document.documentElement.classList.remove('locked');
@@ -859,6 +888,8 @@
   // Cover click & touch events
   if (cover) {
     cover.addEventListener('click', openInvite);
+    cover.addEventListener('pointerdown', unlockAndPlayAudio, { passive: true });
+    cover.addEventListener('touchstart', unlockAndPlayAudio, { passive: true });
     cover.addEventListener('touchend', (e) => {
       if (e.target.closest('#mute-btn')) return;
       e.preventDefault();
@@ -870,8 +901,9 @@
   if (muteBtn && audio) {
     muteBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      tryPlayMusic();
-      if (audio.paused) {
+      if (audio.paused || audio.muted) {
+        audio.muted = false;
+        audio.volume = 0.55;
         audio.play().catch(() => {});
         iconSound.style.display = '';
         iconMuted.style.display = 'none';
